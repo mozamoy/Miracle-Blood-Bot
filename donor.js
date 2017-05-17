@@ -34,7 +34,12 @@ var donorSchema = mongoose.Schema({
     bloodgroup: {
         type: String,
         required: true
+    },
+    id: {
+        type: String,
+        required: true
     }
+    
 
    
 });
@@ -45,18 +50,21 @@ module.exports.addDonor= function(data, callback) {
     donor.create(data, callback);
 }
 module.exports.getDonorByField = function(ret, callback) {
-    donor.find({name:ret}, callback);
+    donor.find({id:ret}, callback);
 }
-module.exports.updateProduct = function(name, data, options, callback) {
+module.exports.updateDonorData = function(name, data, options, callback) {
     var query = {
-        name: name
+        id: id
     };
     var update = {
-        name: data.name,
-        type: data.type,
-        cost: data.cost,
-        supplier: data.supplier,
-        avail: data.avail
+         name:data.name,
+              gender:data.gender,
+              location:data.location,
+              age:data.age,
+              mobile:data.mobile,
+              altmobile:data.altmobile,
+              bloodgroup:data.bloodgroup,
+              id:data.sender
     }
     donor.findOneAndUpdate(query, update, options, callback);
 }

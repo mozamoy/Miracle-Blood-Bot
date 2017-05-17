@@ -1,14 +1,20 @@
 const express = require('express');
+var uuid=require('uuid');
+var app=express();
+let session=uuid.v1();
 const bodyParser = require('body-parser');
+
+//var session = require('client-sessions');
+
+
 const request = require('request');
 const apiaiApp = require('apiai')("684570cb2e50427286e5a54e991e2093");
 var name="",gender="",location="",age="",bloodgroup="",mobile="",altmobile="";
 var mongoose = require('mongoose');
 var MongoClient = require('mongodb').MongoClient;
 var obj = require('./donor');
-mongoose.connect('mongodb://localhost:27017/donor');
+mongoose.connect('mongodb://localhost:27017/donors');
 
-const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -41,20 +47,26 @@ app.post('/webhook', (req, res) => {
   }
 });
 function sendMessage(event) {
+    
   let sender = event.sender.id;
   let text = event.message.text;
     var temp=JSON.stringify(text);
-
+console.log(sender);
+ 
   let apiai = apiaiApp.textRequest(text, {
-    sessionId: 'tabby_cat' // use any arbitrary id
-      
+    sessionId: sender
   });
 
   apiai.on('response', (response) => {
     // Got a response from api.ai. Let's POST to Facebook Messenger
       let aiText = response.result.fulfillment.speech;
             if(aiText==="can you please mention your gender?")
-      name=temp;
+                {
+                name=temp;
+                    
+                    
+                    
+                }
       if(aiText==="where are you from?" || aiText==='can you please mention your location?' || aiText==='can you please tell me your location?' || aiText==='could you tell me where you live?')
       gender=temp;
       if(aiText==="what is your mobile number?" || aiText==='can you please tell your mobile no?')
@@ -77,7 +89,8 @@ function sendMessage(event) {
               age:age,
               mobile:mobile,
               altmobile:altmobile,
-              bloodgroup:bloodgroup
+              bloodgroup:bloodgroup,
+              id:sender
           }
           console.log(data);
           obj.addDonor(data,function(err,data){
